@@ -1,0 +1,25 @@
+views:
+  - type: table
+    name: 表格
+    filters:
+      and:
+        - file.inFolder("LLM研究调研-2026-06/Agent方向论文卡片")
+        - file.basename != "README"
+    order:
+      - year
+      - publication_type
+      - area
+      - file.name
+      - read
+      - comment
+    sort:
+      - property: area
+        direction: DESC
+      - property: file.name
+        direction: ASC
+      - property: year
+        direction: DESC
+    columnSize:
+      note.year: 103
+      note.area: 396
+      file.name: 620

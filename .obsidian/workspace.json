@@ -1,0 +1,235 @@
+{
+  "main": {
+    "id": "ae16a5eb79dba30c",
+    "type": "split",
+    "children": [
+      {
+        "id": "699b0da6b2353587",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1723775f5e41cee4",
+            "type": "leaf",
+            "state": {
+              "type": "bases",
+              "state": {
+                "file": "表1-LLM团队.base",
+                "viewName": "表格"
+              },
+              "icon": "lucide-table",
+              "title": "表1-LLM团队"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "2e6ee32e506fb376",
+    "type": "split",
+    "children": [
+      {
+        "id": "66f614f2fb5d2db7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "278ca8cc0aece56d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": true
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "7f376e104372383c",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "设置",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "8446794d089691c5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 423.5
+  },
+  "right": {
+    "id": "8f9915b31788bb8e",
+    "type": "split",
+    "children": [
+      {
+        "id": "13d350b7c6d4ebc6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "28948362fc4b48da",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "表1-LLM团队.base",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "表1-LLM团队 的反向链接列表"
+            }
+          },
+          {
+            "id": "3ac5d4b84840f7fb",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "未命名 1.base",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "未命名 1 的出链列表"
+            }
+          },
+          {
+            "id": "f1fec1e3a5a71bdf",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "9f305b3f4c3a890d",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "da81f6ec893146a0",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "未命名 1.base",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "未命名 1 的大纲"
+            }
+          },
+          {
+            "id": "6f7875d051a8289e",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
+          }
+        ],
+        "currentTab": 5
+      }
+    ],
+    "direction": "horizontal",
+    "width": 533.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false,
+      "obsidian-git:Open Git source control": false
+    }
+  },
+  "active": "6f7875d051a8289e",
+  "lastOpenFiles": [
+    "表2-LLM论文.base",
+    "LLM研究调研-2026-06/Agent/ToolSandbox - Stateful Interactive Tool Use Evaluation.md",
+    "LLM研究调研-2026-06/OpenAI LLM 研究方向.md",
+    "LLM研究调研-2026-06/README.md",
+    "LLM研究调研-2026-06/Agent/ToolLLM - Mastering 16000 Real-world APIs.md",
+    "LLM研究调研-2026-06/Agent/Survey on Evaluation of LLM-based Agents.md",
+    "LLM研究调研-2026-06/Agent/The AI Scientist - Automated Open-Ended Scientific Discovery.md",
+    "LLM研究调研-2026-06/Agent/The Hallucination Leaderboard - LLM Tool Hallucination.md",
+    "LLM研究调研-2026-06/Agent/APWA - Distributed Architecture for Parallelizable Agentic Workflows.md",
+    "LLM研究调研-2026-06/Agent/AgentBay - Hybrid Interaction Sandbox for Human-AI Intervention.md",
+    "LLM研究调研-2026-06/Tream/PolyU Hongxia Yang 团队 - 多模态推理与边缘基础模型.md",
+    "LLM研究调研-2026-06/Agent/MetaGPT - Meta Programming for Multi-Agent Collaborative Framework.md",
+    "LLM研究调研-2026-06/Agent/AgeMem - Unified Short-Term and Long-Term Memory for Agents.md",
+    "表1-LLM团队.base",
+    "LLM研究调研-2026-06/Google LLM 研究方向.md",
+    "LLM研究调研-2026-06/香港 LLM 相关课题组与机构.md",
+    "LLM研究调研-2026-06/Agent/Experiential Reflective Learning for Self-Improving LLM Agents.md",
+    "LLM研究调研-2026-06/Agent/Optimizing Agentic Workflows using Meta-tools.md",
+    "LLM研究调研-2026-06/Agent/Data Interpreter - An LLM Agent For Data Science.md",
+    "LLM研究调研-2026-06/Tream/HKUST VSDL - LLM 系统与推理加速.md",
+    "LLM研究调研-2026-06/Agent/Single-Agent LLMs Outperform Multi-Agent Systems under Equal Thinking Budgets.md",
+    "LLM研究调研-2026-06/Agent/Skill-SD - Skill-Conditioned Self-Distillation for Multi-turn LLM Agents.md",
+    "LLM研究调研-2026-06/Agent/FlowSteer - Interactive Agentic Workflow Orchestration.md",
+    "LLM研究调研-2026-06/Agent/MASFactory - Graph-centric Orchestration for Multi-Agent Systems.md",
+    "LLM研究调研-2026-06/Agent/AOrchestra - Automating Sub-Agent Creation for Agentic Orchestration.md",
+    "LLM研究调研-2026-06/Agent/Utility-Guided Agent Orchestration for Efficient LLM Tool Use.md",
+    "LLM研究调研-2026-06/Agent/Orla - Serving LLM-Based Multi-Agent Systems.md",
+    "LLM研究调研-2026-06/Agent",
+    "未命名 1.base",
+    "未命名.canvas",
+    "未命名 3.base",
+    "未命名 2.canvas",
+    "未命名 1.canvas",
+    "未命名 2.base",
+    "LLM研究调研-2026-06/Tream",
+    "LLM研究调研-2026-06"
+  ]
+}
