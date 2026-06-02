@@ -4,20 +4,20 @@
     "type": "split",
     "children": [
       {
-        "id": "699b0da6b2353587",
+        "id": "019f79b052f12c7a",
         "type": "tabs",
         "children": [
           {
-            "id": "1723775f5e41cee4",
+            "id": "ce14f4d3f2384ade",
             "type": "leaf",
             "state": {
               "type": "bases",
               "state": {
-                "file": "表1-LLM团队.base",
+                "file": "表1-Agent.base",
                 "viewName": "表格"
               },
               "icon": "lucide-table",
-              "title": "表1-LLM团队"
+              "title": "表1-Agent"
             }
           }
         ]
@@ -93,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "表1-LLM团队.base",
+                "file": "表1-Agent.base",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "表1-LLM团队 的反向链接列表"
+              "title": "表1-Agent 的反向链接列表"
             }
           },
           {
@@ -179,7 +179,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 533.5
+    "width": 446.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -193,36 +193,37 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "6f7875d051a8289e",
+  "active": "278ca8cc0aece56d",
   "lastOpenFiles": [
-    "表2-LLM论文.base",
-    "LLM研究调研-2026-06/Agent/ToolSandbox - Stateful Interactive Tool Use Evaluation.md",
+    "Agent/Data Interpreter - An LLM Agent For Data Science.md",
+    "Agent/AgentTuning - Enabling Generalized Agent Abilities for LLMs.md",
+    "Agent/BrowserArena - Evaluating LLM Agents on Real-World Web Navigation Tasks.md",
+    "Agent/AMA-Bench - Long-Horizon Memory for Agentic Applications.md",
+    "表1-LLM团队.base",
+    "表1-Agent.base",
+    "Agent/ToolSandbox - Stateful Interactive Tool Use Evaluation.md",
     "LLM研究调研-2026-06/OpenAI LLM 研究方向.md",
     "LLM研究调研-2026-06/README.md",
-    "LLM研究调研-2026-06/Agent/ToolLLM - Mastering 16000 Real-world APIs.md",
-    "LLM研究调研-2026-06/Agent/Survey on Evaluation of LLM-based Agents.md",
-    "LLM研究调研-2026-06/Agent/The AI Scientist - Automated Open-Ended Scientific Discovery.md",
-    "LLM研究调研-2026-06/Agent/The Hallucination Leaderboard - LLM Tool Hallucination.md",
-    "LLM研究调研-2026-06/Agent/APWA - Distributed Architecture for Parallelizable Agentic Workflows.md",
-    "LLM研究调研-2026-06/Agent/AgentBay - Hybrid Interaction Sandbox for Human-AI Intervention.md",
+    "Agent/ToolLLM - Mastering 16000 Real-world APIs.md",
+    "Agent/Survey on Evaluation of LLM-based Agents.md",
+    "Agent/The AI Scientist - Automated Open-Ended Scientific Discovery.md",
+    "Agent/The Hallucination Leaderboard - LLM Tool Hallucination.md",
+    "Agent/APWA - Distributed Architecture for Parallelizable Agentic Workflows.md",
+    "Agent/AgentBay - Hybrid Interaction Sandbox for Human-AI Intervention.md",
     "LLM研究调研-2026-06/Tream/PolyU Hongxia Yang 团队 - 多模态推理与边缘基础模型.md",
-    "LLM研究调研-2026-06/Agent/MetaGPT - Meta Programming for Multi-Agent Collaborative Framework.md",
-    "LLM研究调研-2026-06/Agent/AgeMem - Unified Short-Term and Long-Term Memory for Agents.md",
-    "表1-LLM团队.base",
+    "Agent/MetaGPT - Meta Programming for Multi-Agent Collaborative Framework.md",
+    "Agent/AgeMem - Unified Short-Term and Long-Term Memory for Agents.md",
     "LLM研究调研-2026-06/Google LLM 研究方向.md",
     "LLM研究调研-2026-06/香港 LLM 相关课题组与机构.md",
-    "LLM研究调研-2026-06/Agent/Experiential Reflective Learning for Self-Improving LLM Agents.md",
-    "LLM研究调研-2026-06/Agent/Optimizing Agentic Workflows using Meta-tools.md",
-    "LLM研究调研-2026-06/Agent/Data Interpreter - An LLM Agent For Data Science.md",
+    "Agent/Experiential Reflective Learning for Self-Improving LLM Agents.md",
+    "Agent/Optimizing Agentic Workflows using Meta-tools.md",
     "LLM研究调研-2026-06/Tream/HKUST VSDL - LLM 系统与推理加速.md",
-    "LLM研究调研-2026-06/Agent/Single-Agent LLMs Outperform Multi-Agent Systems under Equal Thinking Budgets.md",
-    "LLM研究调研-2026-06/Agent/Skill-SD - Skill-Conditioned Self-Distillation for Multi-turn LLM Agents.md",
-    "LLM研究调研-2026-06/Agent/FlowSteer - Interactive Agentic Workflow Orchestration.md",
-    "LLM研究调研-2026-06/Agent/MASFactory - Graph-centric Orchestration for Multi-Agent Systems.md",
-    "LLM研究调研-2026-06/Agent/AOrchestra - Automating Sub-Agent Creation for Agentic Orchestration.md",
-    "LLM研究调研-2026-06/Agent/Utility-Guided Agent Orchestration for Efficient LLM Tool Use.md",
-    "LLM研究调研-2026-06/Agent/Orla - Serving LLM-Based Multi-Agent Systems.md",
-    "LLM研究调研-2026-06/Agent",
+    "Agent/Single-Agent LLMs Outperform Multi-Agent Systems under Equal Thinking Budgets.md",
+    "Agent/Skill-SD - Skill-Conditioned Self-Distillation for Multi-turn LLM Agents.md",
+    "Agent/FlowSteer - Interactive Agentic Workflow Orchestration.md",
+    "Agent/MASFactory - Graph-centric Orchestration for Multi-Agent Systems.md",
+    "Agent/AOrchestra - Automating Sub-Agent Creation for Agentic Orchestration.md",
+    "Agent",
     "未命名 1.base",
     "未命名.canvas",
     "未命名 3.base",

@@ -3,8 +3,8 @@ views:
     name: 表格
     filters:
       and:
-        - file.inFolder("LLM研究调研-2026-06/Agent方向论文卡片")
         - file.basename != "README"
+        - file.inFolder("Agent")
     order:
       - year
       - publication_type
