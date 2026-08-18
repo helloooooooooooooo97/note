@@ -27,6 +27,7 @@
 4. **实验可落盘、可晋升**：允许 scratch 实验目录，禁止「仅内存、重启即无且无法晋升」作为产品主路径。
 5. **Host / Client 分端加载、同包分发**：一个 npm 包两入口；花名册写一次。
 6. **安全靠默认策略 + 诚实标注**：Sandbox 若 partial 就写 partial；高权限能力默认关闭。
+7. **全程测试驱动（TDD）**：每个 OOD（设计单元 / 模块）先测后码；涉及模型处默认走 **MockLLM**，真实 API 仅作可选 e2e。
 
 ---
 
@@ -413,65 +414,217 @@ Workspace 顺序等元数据走统一 `storage` 插件；Provider 可为 json �
 | 远程 Web | 无认证前不建议 `0.0.0.0` 裸奔 |
 
 ---
-
-## 13. 开发工作流
+## 13. 开发工作流（强制 TDD）
 
 ### 13.1 环境
 
 - Node：与实现选定的 LTS 对齐（建议 ≥ 22）  
 - 包管理：pnpm workspace  
 - 语言：TypeScript strict  
+- 测试：Vitest（或等价）；默认 **不依赖真实 LLM API Key**
 
 ### 13.2 常用命令（示意）
 
 ```bash
 pnpm install
 pnpm build
-pnpm test
+pnpm test                 # 全量；默认走 MockLLM，无外网 key
+pnpm test packages/kernel/agent-loop   # 单包
+pnpm test:watch
 pnpm typecheck
 pnpm ah --profile coding
 pnpm ah --profile coding --dump-config
 pnpm ah plugin add ./packages/plugins/foo
 pnpm ah scratch create demo
 pnpm ah plugin promote scratch/demo
+# 可选：真实提供方 e2e（显式门禁）
+AH_LIVE_LLM=1 DEEPSEEK_API_KEY=… pnpm test:e2e:live
 ```
 
-### 13.3 新增官方插件 Checklist
+### 13.3 TDD 循环（每个 OOD 强制）
 
-1. 建包：`packages/plugins/<name>`，写 `ah.contributes`  
-2. 实现 host；需要 UI 则加 `./client` + slot 注册  
-3. 单测：注册/卸载对称、工具 schema、权限拒绝路径  
-4. 若模型可见：补事件类型与「从 log 重建」测试  
-5. 挂到某个 profile 模板（默认或 optional）  
-6. 更新子系统文档与工具目录（若有生成器则跑生成）  
+**OOD** = 本文目录中的一个可交付设计单元（一个 package、一个清晰边界的类/服务、或一条 Capability Provider）。  
+**规则：没有对应用例的 OOD 不得合并。**
 
-### 13.4 修改 AgentLoop Checklist
+对每一个 OOD，严格按：
 
-1. 先更新本文与 `docs/subsystems/agent-loop.md`  
-2. 保持模型可见 ⟺ 已记录  
-3. 取消路径必须完全停稳  
-4. 补回归：steer/queue、工具并行、max-tokens、abort  
+```text
+1. 写失败测试（Red）     ← 先定行为与契约
+2. 写最小实现（Green）   ← 只为让测试通过
+3. 重构（Refactor）      ← 保持测试绿
+4. 提交                  ← 测试与实现同 PR
+```
 
-### 13.5 禁止事项
+禁止：
+
+- 先写完实现再补测「走过场」  
+- 用真实 LLM 作为默认单测依赖  
+- 合并「有代码、无对应 `*.spec.ts` / `*.test.ts`」的 kernel/plugin OOD  
+
+### 13.4 OOD ↔ 测试映射（最低要求）
+
+| OOD / 包 | 必须覆盖的测试 | MockLLM？ |
+|----------|----------------|-----------|
+| `session-log` | append、surface fold、deriveMessages、fork 边界、损坏拒绝 | 否 |
+| `agent-loop` | queue/steer、turn/step、取消停稳、工具续跑、max-tokens、request/header 重建 | **是** |
+| `tools` | 注册/卸载、schema 校验、pre/exec/post、并行/排他、审批拒绝 | 否（可假工具） |
+| `capabilities/llm` 接口 | adapter 注册、无 adapter 错误、stream 契约 | **是** |
+| 各 `llm-*` provider | 对 MockLLM 的请求形状、重试/断流行为 | **是** |
+| `fs` / `shell` / `sandbox` | 权限边界、fail-closed、partial 报告 | 否 |
+| `gateway` / Remote | 方法分发、参数校验、鉴权/回环 | 否 |
+| 每个 Plugin | contributes 装载、卸载对称、至少 1 条主路径行为 | 若调用模型则 **是** |
+| `client-runtime` | 列表基线、事件折叠、queue 投影 | 可用 fixture 帧，不必真连 |
+| `client-connection` | RPC 编解码、重连 generation（可用假 HTTP） | 否 |
+| UI Plugin | slot 注册、关键交互（组件测）；不测像素 | 否 |
+
+每个 OOD 目录约定：
+
+```text
+packages/<area>/<ood>/
+  src/
+  tests/
+    <ood>.spec.ts          # 行为主测（必有）
+    invariant.spec.ts      # 若有不变量伴侣
+    *.reconstruction.spec.ts  # 若触及模型可见性
+```
+
+CI 门禁（示意）：
+
+- `pnpm test` 全绿  
+- kernel 包：变更文件行覆盖率门槛（建议 ≥ 90%，团队可调）  
+- 新增 `packages/**/src/**` 必须伴随同包 `tests/**` 变更（脚本可检）  
+
+### 13.5 新增官方插件 Checklist（TDD 版）
+
+1. **先**建 `tests/`：装载失败用例、主工具/Remote 契约用例（Red）  
+2. 写 `ah.contributes` + 最小 host 实现至绿  
+3. 需要 UI：先写 slot 注册/卸载测，再写 client  
+4. 若会调模型：接入 **MockLLM**（见 §14），禁止默认 live  
+5. 若模型可见：补「从 SessionLog 重建」测试  
+6. 挂 profile 模板 + 文档  
+
+### 13.6 修改 AgentLoop Checklist（TDD 版）
+
+1. 先更新/新增失败用例（queue、steer、abort、工具并行等）  
+2. 再改 loop；保持模型可见 ⟺ 已记录  
+3. 全套 agent-loop 测 + MockLLM 脚本场景必须绿  
+4. 更新子系统文档  
+
+### 13.7 禁止事项
 
 - 新增第四种扩展通道（又一种「临时 mount」）  
 - UI 组件直接 import 另一 UI 插件实现  
 - 把展示用结构写入 SessionLog 冒充历史  
 - 在无 disposer 的情况下注册全局 hook  
+- **无测试合并 OOD**  
+- **单测默认打真实 LLM**  
 
 ---
 
-## 14. 测试策略
+## 14. 测试策略与 MockLLM
 
-| 层级 | 内容 |
-|------|------|
-| 单元 | schema、纯函数、inbox queue/steer、surface fold |
-| 组件/插件 | 装载卸载、工具执行、Remote 契约 |
-| 回放 | 固定 session 日志 → 期望模型可见 messages / tool schemas |
-| e2e | 真实或 mock LLM；无 key 则 skip |
-| 契约 | contributes 与实际注册一致；client 包必须有 `./client` 产物 |
+### 14.1 测试金字塔
 
-覆盖率：对 kernel 建议高门槛；插件按风险定。
+| 层级 | 占比（建议） | 内容 | LLM |
+|------|--------------|------|-----|
+| 单元 | 最多 | 纯函数、schema、surface、inbox、工具管线 | Mock / 假工具 |
+| 组件/插件 | 多 | 装载卸载、Remote、权限 | MockLLM（若需要） |
+| Loop 集成 | 中 | 真实 AgentLoop + MockLLM + 内存/临时 SessionLog | **MockLLM 必选** |
+| 回放快照 | 中 | 固定 log → 期望 messages / tool schemas | 无（或录制自 Mock） |
+| Live e2e | 少 | 真实提供方；`AH_LIVE_LLM=1` 才跑；无 key skip | 真 |
+
+### 14.2 MockLLM 定位
+
+MockLLM 是 **一等测试设施**，不是可有可无的辅助脚本。
+
+职责：
+
+- 提供 OpenAI 兼容（或本项目 LLM 适配器所针对）的 HTTP/SSE 端点  
+- 按 **FIFO 行为脚本** 响应每次请求（成功流、断连、超时、限流、鉴权失败等）  
+- 记录收到的请求体，供断言「发了什么 messages/tools/system」  
+- 进程内可嵌（推荐单测）或独立端口（适配器/e2e）
+
+推荐包名：`packages/test-support/mock-llm/`。
+
+### 14.3 MockLLM API 约定（实现须满足）
+
+```ts
+type MockLlmBehavior =
+  | { kind: 'success'; text?: string; toolCalls?: ToolCallScript[]; usage?: Usage }
+  | { kind: 'stream_text'; deltas: string[]; delayMs?: number }
+  | { kind: 'partial_disconnect'; deltas: string[] }
+  | { kind: 'connection_reset' }
+  | { kind: 'rate_limit'; retryAfterMs?: number }
+  | { kind: 'auth_error' }
+  | { kind: 'stall'; idleMs: number }
+
+interface MockLlmServer {
+  readonly baseURL: string
+  readonly requests: readonly CapturedRequest[]
+  close(): Promise<void>
+}
+
+function startMockLlmServer(options: {
+  sequence: readonly MockLlmBehavior[]
+  apiKey?: string
+  repeatLast?: boolean
+}): Promise<MockLlmServer>
+```
+
+规则：
+
+1. 非法 HTTP/错误 key **不消耗** sequence 条目  
+2. sequence 耗尽 → 结构化 500（或明确错误），测试应失败而非挂死  
+3. 默认测试用 `baseURL` + fake key 注入 llm provider 配置  
+4. 支持断言 `requests[i].body.messages` / `tools` 与 SessionLog 重建一致  
+
+### 14.4 进程内 Fake Adapter（更快的单元路径）
+
+除 HTTP MockLLM 外，kernel 单测可注册 **内存 FakeLlmAdapter**：
+
+- 实现与正式 adapter 相同的 `stream()` 契约  
+- 同样按 sequence 吐 chunk  
+- 零端口、适合 agent-loop 海量用例  
+
+约定：
+
+- Fake Adapter 与 MockLLM **共享同一套 Behavior 类型**（避免两套剧本）  
+- Provider 集成测必须打 **HTTP MockLLM**（至少一条），防止「假适配器绿、真适配器红」  
+
+### 14.5 标准场景清单（AgentLoop / LLM 相关 OOD 必选子集）
+
+每个触及模型的 OOD，按需覆盖（agent-loop **全部**覆盖）：
+
+| 场景 ID | Behavior 脚本要点 | 断言 |
+|---------|-------------------|------|
+| `happy_text` | success 文本 | 一轮完成；log 可重建 |
+| `tool_then_text` | toolCalls → success | 两 step；tool/result 入 log |
+| `steer_midway` | 长 stream + steer | 下一 step 含 steer |
+| `queue_two` | 两次 success | 两 turn FIFO |
+| `cancel_running` | stall + cancel | 完全停稳；turn aborted |
+| `max_tokens` | finish max-tokens | turn reason 正确 |
+| `retry_then_ok` | rate_limit → success | 仅配置重试时 |
+| `auth_fail` | auth_error | 错误结构化；无脏状态 |
+| `partial_disconnect` | partial_disconnect | 恢复策略符合设计 |
+| `reconstruct` | 任意成功路径 | `deriveMessages` == 当时请求 messages |
+
+### 14.6 与 SessionLog 联测
+
+凡 MockLLM / FakeAdapter 跑过的成功路径，至少一条测试做：
+
+```text
+跑完 → 取 session.events
+→ deriveMessages() / request header
+→ 深度等于（或规范相等）捕获到的 Mock 请求
+```
+
+这是「模型可见 ⟺ 已记录」的可执行门禁。
+
+### 14.7 Live LLM
+
+- 默认 CI **不跑**  
+- 命名 `*.live.e2e.ts`；环境变量门禁  
+- 不得替代 MockLLM 场景清单  
 
 ---
 
@@ -480,40 +633,43 @@ pnpm ah plugin promote scratch/demo
 - Kernel 与 Plugin 约定用 semver  
 - Session 格式版本单调；预览期可不提供迁移  
 - Remote 字段删除走弃用窗口；生成客户端与 Host 同 PR 更新  
+- MockLLM Behavior 类型变更视为测试设施 breaking，需同步改全仓剧本  
 
 ---
 
-## 16. 里程碑建议
+## 16. 里程碑建议（测试先行）
+
+每个里程碑的 **入口标准** = 对应该范围的测试骨架已红/已挂好；**出口标准** = 全绿 + 文档更新。
 
 ### M0 — 可跑最小环
 
-- SessionLog（jsonl）+ AgentLoop + ToolRuntime  
-- 一个 llm provider + fs/shell（可先无强沙箱）  
-- CLI headless：「一问一答 + 工具」  
+- **先**落地 `mock-llm` + FakeAdapter + 场景清单骨架  
+- SessionLog / ToolRuntime / AgentLoop 按 TDD 完成  
+- 一个 llm provider **只**打 MockLLM 绿  
+- CLI headless 最小路径有集成测  
 
 ### M1 — 可装插件
 
-- Plugin 装载 + Profile  
-- Scratch + Promote  
-- `--dump-config`  
+- Plugin 装载/卸载测先写  
+- Scratch / Promote 测先写  
+- `--dump-config` 快照测  
 
 ### M2 — Web
 
-- Gateway `/api` + connection + client-runtime  
-- ui-shell + conversation + tool 卡片  
-- queue / steer UI  
+- connection / runtime 契约测  
+- UI slot 注册测  
+- queue/steer 经 /api 的集成测（MockLLM）  
 
 ### M3 — 加固
 
-- Sandbox + 审批  
-- Subagent 可选  
-- Session search 可选  
-- 回放测评流水线  
+- Sandbox / 审批表驱动测  
+- Subagent one-shot + MockLLM  
+- 回放快照流水线  
 
 ### M4 — 可选容器 sidecar
 
-- contributes.runtime container  
-- 生命周期与观测回流  
+- 生命周期启停测（可用 testcontainers 或假 runtime）  
+- 默认关闭的配置测  
 
 ---
 
@@ -524,6 +680,9 @@ pnpm ah plugin promote scratch/demo
 3. 卸载插件后工具/路由/UI slot 全部消失（无泄漏）。  
 4. 默认 coding profile 包数量与概念远小于「全家桶」；可选能力显式安装。  
 5. Scratch 重启仍在；Promote 后成为普通依赖。  
+6. **每个已合并 OOD 均有对应测试**；CI 可检出「有 src 无 tests」的违规。  
+7. **默认测试路径零真实 LLM Key**；MockLLM（或共享 Behavior 的 FakeAdapter）覆盖 §14.5 清单。  
+8. AgentLoop 变更不得在 MockLLM 场景清单红着合并。  
 
 ---
 
@@ -540,7 +699,7 @@ queue 消息唤醒
       assistant/chunk* → assistant/message
       tool/call* → tools 管线 → tool/result*
     step/end
-    若仍欠工具续跑或有 steer → 下一步
+    若仍欠工具续跑或有 steer → 下一 step
   turn-stopping
   turn/end
 若 queue 仍有 → 下一 turn
@@ -562,16 +721,41 @@ queue 消息唤醒
 | Remote | /api 上的类型化 RPC 方法 |
 | Slot | 浏览器 UI 组合孔位 |
 | queue / steer | 唯一对外输入产品语义 |
+| OOD | 可交付设计单元（包/服务/Provider）；必须有对应用例 |
+| MockLLM | 脚本化假 LLM HTTP/SSE 服务；默认测试依赖 |
+| FakeAdapter | 进程内假 LLM 适配器；与 MockLLM 共享 Behavior |
 
 ---
 
-## 20. 文档维护
+## 20. 附录：TDD 提交示例
+
+```text
+# 1) 只加红测
+git commit -m "test(agent-loop): add steer_midway MockLLM scenario (red)"
+
+# 2) 最小实现致绿
+git commit -m "feat(agent-loop): honor steer at next step boundary"
+
+# 3) 重构仍绿
+git commit -m "refactor(agent-loop): simplify inbox claim helper"
+```
+
+PR 模板须勾选：
+
+- [ ] 本 PR 涉及的每个 OOD 均有测试变更  
+- [ ] 未引入默认 live LLM 依赖  
+- [ ] 触及模型可见性则含 reconstruction 断言  
+
+---
+
+## 21. 文档维护
 
 - 架构变更先改本文，再改代码  
 - 子系统细节可拆 `docs/subsystems/*.md`，但不得与本文冲突  
 - 实现若偏离本文，须在 PR 中更新本文并说明原因  
+- **新增 OOD 时同步更新 §13.4 映射表**  
 
 ---
 
-*文档版本：0.1（设计稿）*  
+*文档版本：0.2（设计稿 + 强制 TDD / MockLLM）*  
 *对应讨论背景：DeepSeek Harness 源码分析后的收敛重设计*
