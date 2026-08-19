@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRAFT 意图背包：TAAC × KDD Cup 2026 学术冠军讲解</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a222c;
+      --line: #2c3a4a;
+      --text: #e8eef4;
+      --muted: #9aa8b6;
+      --accent: #3d9cf0;
+      --user: #3ecf8e;
+      --item: #f0a12e;
+      --seq: #6b8cff;
+      --intent: #e8c36a;
+      --warn: #f0a12e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Segoe UI", sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1c3a5c 0%, transparent 50%), var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    header {
+      padding: 48px 24px 24px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    header h1 { font-size: 1.85rem; margin: 0 0 8px; letter-spacing: .02em; }
+    .sub { color: var(--muted); font-size: .95rem; }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      margin-right: 6px;
+    }
+    main { max-width: 980px; margin: 0 auto; padding: 0 24px 80px; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin: 16px 0;
+    }
+    h2 { font-size: 1.2rem; margin: 0 0 12px; }
+    h3 { font-size: 1.02rem; margin: 18px 0 8px; color: #c5d4e0; }
+    p { margin: 8px 0; }
+    .note {
+      background: #243040;
+      border-left: 3px solid var(--warn);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+      margin: 12px 0;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+    @media (max-width: 800px) { .flow { grid-template-columns: 1fr 1fr; } }
+    .box {
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      min-height: 92px;
+      font-size: .85rem;
+    }
+    .box b { display: block; margin-bottom: 4px; }
+    .u { background: rgba(62, 207, 142, .12); border-color: #2a6b4e; }
+    .a { background: rgba(240, 161, 46, .12); border-color: #7a5420; }
+    .s { background: rgba(107, 140, 255, .12); border-color: #3a4a8a; }
+    .i { background: rgba(232, 195, 106, .14); border-color: #7a6530; }
+    .steps { display: flex; flex-direction: column; gap: 10px; }
+    .step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .n {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #243040; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: var(--accent);
+    }
+    .katex-display { margin: 12px 0 !important; overflow-x: auto; }
+    footer { color: var(--muted); font-size: .8rem; max-width: 980px; margin: 0 auto; padding: 0 24px 40px; }
+    a { color: var(--accent); }
+    ul { margin: 8px 0; padding-left: 1.2em; }
+    .pipe {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .78rem;
+      background: #12181f;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      white-space: pre;
+      color: #cfe0f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <span class="badge">TAAC × KDD Cup 2026</span>
+      <span class="badge">学术赛道冠军 lozyyeah</span>
+      <span class="badge">CRAFT · Feature Transport</span>
+    </div>
+    <h1>意图背包是怎么吃进数据、又怎么一层层更新的</h1>
+    <p class="sub">单页讲解：赛题真实字段 → tokenize → $I^{(0)}$ 初始化 → 每层四拍更新 → 用 $I^{(L)}$ 打 CVR。公式用 KaTeX 渲染。</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>先说清楚：哪些是公开事实，哪些是复原</h2>
+      <p>队伍 <b>lozyyeah</b> 拿下学术赛道第一，奖金 <b>30 万美元</b>。方法名 <b>CRAFT</b>：把重点从 Feature Interaction 转到 Feature Transport。Intent Token 是跨层载体（媒体称为「意图背包」）。</p>
+      <p class="note">冠军方案没有公开论文和官方 AUC。下面公式是按 workshop / 媒体描述 + UNI-REC 官方 schema / HyFormer 基线习惯<b>复原</b>的，不是 arXiv 原式。工业冠军 QueryFormer 的 AUC +0.0048 不是这套模型的成绩。</p>
+    </section>
+
+    <section>
+      <h2>1. 一行样本里到底有多少数据</h2>
+      <p>初赛量级：约 <b>2 亿</b> 用户序列样本（官方介绍）。Demo 是 1000 行、120 列的扁平 Parquet。预测目标是广告 CVR（点后转化），指标 AUC，且有推理时延上限。</p>
+      <table>
+        <thead>
+          <tr><th>区块</th><th>列数</th><th>是什么</th><th>进 Intent 的角色</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ID / label / timestamp</td>
+            <td>5</td>
+            <td>样本键、标签、请求时间</td>
+            <td>训练监督；时间可做成周期特征进 NS</td>
+          </tr>
+          <tr>
+            <td><b>user_int</b></td>
+            <td>46</td>
+            <td>35 个标量 + 11 个多值数组（画像、偏好等）</td>
+            <td>NS → 控制信号（怎么读）</td>
+          </tr>
+          <tr>
+            <td><b>user_dense</b></td>
+            <td>10</td>
+            <td>浮点数组；含 embedding 类（如 61、87）及与 int 对齐的 62–66、89–91</td>
+            <td>NS → 控制信号（怎么读）</td>
+          </tr>
+          <tr>
+            <td><b>item_int（广告）</b></td>
+            <td>14</td>
+            <td>类目、类型、多标签等</td>
+            <td>NS → 控制信号（面对哪条广告）</td>
+          </tr>
+          <tr>
+            <td>四域行为序列</td>
+            <td>45</td>
+            <td>seq_a 9 列 / seq_b 14 / seq_c 12 / seq_d 10</td>
+            <td>序列状态 → 证据（写什么进背包）</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>序列截断（基线常见，非 CRAFT 官方超参）：$L_a=L_b=256$，$L_c=L_d=512$。每步是该域多列 id 拼起来的一条事件，不是一个 int。</p>
+      <p><b>不是</b>「user_int 和 user_dense 捆成背包、Ad 一包、序列一包」。三路原料如下，背包是第四样东西。</p>
+      <div class="flow">
+        <div class="box u"><b>User</b>46 int + 10 dense<br>变成若干 NS token</div>
+        <div class="box a"><b>Item / Ad</b>14 int（+ dense 若有）<br>变成若干 NS token</div>
+        <div class="box s"><b>Seq</b>四域 × 最长数百步<br>变成 $H^{(m)}$</div>
+        <div class="box i"><b>Intent $I$</b>另起的 $K_I$ 个 token<br>跨层更新，最后打分</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Tokenize：数据如何变成三类张量</h2>
+      <h3>非序列 NS（人 + 货）</h3>
+      <p>稀疏 id：$e(v)=E[v]\in\mathbb{R}^{d_e}$。基线 RankMixer 常把 user 压成 $K_u=5$ 个 token、item 压成 $K_a=2$ 个。Dense 再投影成额外 NS token（也可分组 gate 融成 1 个 user dense token）。</p>
+      $$
+      Z^{\mathrm{NS}} = \bigl[U_{\text{user int/dense}};\ A_{\text{ad}}\bigr] \in \mathbb{R}^{N\times d}
+      $$
+      <p>$N$ 很小（几个到十几个），这是<b>控制</b>，不是背包本体。</p>
+      <h3>序列（四个域独立）</h3>
+      $$
+      s^{(m)}_t = W^{(m)}\,\mathrm{Concat}(\text{该步各列 embedding},\ \tau_t),\quad
+      H^{(m)}=\mathrm{Enc}^{(m)}(S^{(m)}) \in \mathbb{R}^{L_m\times d}
+      $$
+      <p>$m\in\{a,b,c,d\}$。这是<b>素材</b>，一步一个 token，很长。</p>
+      <h3>Intent 初值（公开未给出精确式；与「浅层就用人×货管背包」最贴的写法）</h3>
+      $$
+      I^{(0)} = W_0\,\mathrm{Pool}(Z^{\mathrm{NS}}) + b_0 \in \mathbb{R}^{K_I\times d}
+      $$
+      <p>$K_I$ 很小（1 或少数个）。此时背包 ≈「这个用户看这条广告」的先验。<b>45 列序列通常还没写进去</b>。也可以加可学习 $I_{\mathrm{learn}}$，但纯 0 向量当锚点不合理：拉回时会丢掉人×货条件。</p>
+    </section>
+
+    <section>
+      <h2>3. 背包如何逐步更新（一层四拍）</h2>
+      <p>状态：$I^{(\ell)}\to I^{(\ell+1)}$。同一条短向量走 $L$ 层，不是每层新建。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <div>
+            <b>只出规则：46+10+14 这些 NS 汇总成控制</b>
+            $$c^{(\ell)}=\mathrm{Pool}(Z^{\mathrm{NS},(\ell)})$$
+            $$\gamma^{(\ell)},\beta^{(\ell)},g^{(\ell)}=\mathrm{MLP}(c^{(\ell)})$$
+            这一拍<b>不把某个点击写进 $I$</b>。User+Ad 告诉模型：该把意图拧向哪、这层更新可不可信。
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <div>
+            <b>Transport：搬家 + 可撤销</b>
+            $$\widetilde{I}=(1+\gamma^{(\ell)})\odot I^{(\ell)}+\beta^{(\ell)}$$
+            $$I^{\leftarrow}=g^{(\ell)}\,\widetilde{I}+(1-g^{(\ell)})\,I^{(0)}$$
+            $g\to 1$ 接受本层；$g\to 0$ 拉回 $I^{(0)}$，避免深层把意图冲掉。序列 $H$ 往往同步 FiLM。
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <div>
+            <b>写入证据：四域序列被当前 Intent 检索</b>
+            $$\Delta I=\mathrm{CrossAttn}(Q=I^{\leftarrow},\ K=V=H^{\leftarrow})$$
+            $$I^{\mathrm{tr}}=I^{\leftarrow}+\Delta I$$
+            注意力大的那些步（例如同类广告、近期转化）进入 $\Delta I$。残差累加：旧结论还在。这是序列<b>唯一</b>把内容装进背包的主路径。
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">4</div>
+          <div>
+            <b>Interaction：再和 NS 细交叉，交给下一层</b>
+            $$I^{(\ell+1)},H^{(\ell+1)},Z^{\mathrm{NS},(\ell+1)}=\mathrm{Mix}(I^{\mathrm{tr}},H^{\leftarrow},Z^{\mathrm{NS}})$$
+            Mix = Cross-Attention / RankMixer 等。顺序必须是 Transport 在前、Interaction 在后。
+          </div>
+        </div>
+      </div>
+      <p>一层合写：</p>
+      $$
+      I^{(\ell+1)}=\mathcal{U}\bigl(I^{(\ell)};\,Z^{\mathrm{NS}},\,H,\,I^{(0)}\bigr)
+      $$
+      <div class="pipe">I^(0)  [仅 User×Ad 先验]
+  → 层1: 控制(NS) → 拉回/推空间 → CrossAttn(seq_a..d) → Mix → I^(1)
+  → 层2: Query 已是 I^(1)，再去抠上一层没对齐的行为
+  → …
+  → I^(L) → MLP → CVR</div>
+    </section>
+
+    <section>
+      <h2>4. 三路数据分别贡献什么</h2>
+      <table>
+        <thead>
+          <tr><th>数据</th><th>张量</th><th>更新通道</th><th>若去掉会怎样</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>user_int + user_dense</td>
+            <td>部分 $Z^{\mathrm{NS}}$</td>
+            <td>$\gamma,\beta,g$ 与 Mix</td>
+            <td>不知道「谁」，控制与交叉都缺人侧</td>
+          </tr>
+          <tr>
+            <td>item_int（广告）</td>
+            <td>部分 $Z^{\mathrm{NS}}$</td>
+            <td>同上；决定检索哪种意图</td>
+            <td>序列无法按「当前广告」对齐</td>
+          </tr>
+          <tr>
+            <td>seq_a…d 共 45 列、最长数百步</td>
+            <td>$H$</td>
+            <td>$\Delta I$ 残差写入</td>
+            <td>背包停在先验，没有行为证据</td>
+          </tr>
+          <tr>
+            <td>$I^{(0)}$</td>
+            <td>短 token</td>
+            <td>$(1-g)I^{(0)}$ 锚点</td>
+            <td>深层无法把冲淡的意图拉回来</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>预测：</p>
+      $$
+      \hat{y}=\sigma\bigl(\mathrm{MLP}(\mathrm{Pool}(I^{(L)}))\bigr)
+      $$
+      报道强调<b>不用</b>多层后已衰减的原始序列池化当主表征。
+    </section>
+
+    <section>
+      <h2>5. 赛场结果（有数的 / 没数的）</h2>
+      <table>
+        <thead><tr><th>项</th><th>值</th></tr></thead>
+        <tbody>
+          <tr><td>学术冠军</td><td>lozyyeah · CRAFT</td></tr>
+          <tr><td>奖金</td><td>$300,000（本届单项最高）</td></tr>
+          <tr><td>赛制</td><td>禁止 ensemble；AUC；超时提交作废</td></tr>
+          <tr><td>公开冠军 AUC</td><td><b>无</b></td></tr>
+          <tr><td>定性消融（媒体）</td><td>加深 Block 效果升、Intent 空间更丰富；加宽过了收益停</td></tr>
+          <tr><td>旁证（别人的 public，非冠军）</td><td>约 0.831～0.832 一档有开源；基线约 0.81</td></tr>
+          <tr><td>工业冠军 QueryFormer（对照）</td><td>相对 baseline AUC +0.0048，算力约 −18%</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <footer>
+    资料：UNI-REC schema / demo 1000 列说明、HyFormer 基线 tokenize、机器之心与量子位对 KDD 2026 workshop 的转述。
+    本页为学习笔记，公式为复原。官方赛站 <a href="https://algo.qq.com/">algo.qq.com</a>。
+  </footer>
+</body>
+</html>
