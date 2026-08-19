@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "create-learning-path": {
+      "source": "cursor/plugins",
+      "sourceType": "github",
+      "skillPath": "teaching/skills/create-learning-path/SKILL.md",
+      "computedHash": "e3b0d621d6d9f288369cd3467ea2f7be05c046d1989bd070b693b2c5e44885a9"
+    },
+    "exercise-builder": {
+      "source": "willoscar/research-units-pipeline-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/exercise-builder/SKILL.md",
+      "computedHash": "e3c62a68a0de5f8178f2849a9a652175cb01bc32892a4285a0db106194464faf"
+    },
+    "source-tutorial-writer": {
+      "source": "willoscar/research-units-pipeline-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/source-tutorial-writer/SKILL.md",
+      "computedHash": "7f8a9e6f4603fd16f5fdc3eda1299ec3db0b269f6ef46198476ed5b39fa9e916"
+    },
+    "teach": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/teach/SKILL.md",
+      "computedHash": "b8a69574c7a019bed84e84313dc8bf02e1d1bf925ba43057d433217c63863206"
+    },
+    "tutorial-context-pack": {
+      "source": "willoscar/research-units-pipeline-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/tutorial-context-pack/SKILL.md",
+      "computedHash": "446eab3a91305a826d3a2816ef700f578dd3fc063cf93ec49125d1774adc360a"
+    }
+  }
+}
