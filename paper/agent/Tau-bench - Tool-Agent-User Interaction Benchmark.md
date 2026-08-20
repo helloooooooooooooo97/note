@@ -15,7 +15,7 @@ area:
 arxiv: "2406.12045"
 url: https://arxiv.org/abs/2406.12045
 gpu_requirement: low
-comment: 的
+comment:
 ---
 # Tau-bench - Tool-Agent-User Interaction Benchmark
 
